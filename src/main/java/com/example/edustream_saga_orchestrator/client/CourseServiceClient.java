@@ -1,13 +1,10 @@
-package com.example.edustream_bff.client;
+package com.example.edustream_saga_orchestrator.client;
 
-import com.example.edustream_bff.dto.backendResponse.BackendCourseDTO;
-import com.example.edustream_bff.dto.backendResponse.PageResponseDTO;
-import com.example.edustream_bff.dto.requestDTO.BFFCourseRequestByIdDTO;
-import com.example.edustream_bff.dto.requestDTO.BFFCourseRequestByUUIDDTO;
-import com.example.edustream_bff.dto.requestDTO.BFFRegisterCourseRequestDTO;
-import com.example.edustream_bff.dto.responseDTO.ApiResponse;
-import com.example.edustream_bff.dto.responseDTO.BFFRegisterCourseResponseDTO;
-import com.example.edustream_bff.exception.CourseMicroServiceException;
+import com.example.edustream_saga_orchestrator.dto.backendResponseDTO.BackendCourseDTO;
+import com.example.edustream_saga_orchestrator.dto.requestDTO.SagaCourseRequestByIdDTO;
+import com.example.edustream_saga_orchestrator.dto.requestDTO.SagaCourseRequestByUUIDDTO;
+import com.example.edustream_saga_orchestrator.dto.responseDTO.ApiResponse;
+import com.example.edustream_saga_orchestrator.exception.CourseMicroServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,15 +24,6 @@ public class CourseServiceClient {
     private final RestClient restClient;
 
     // Endpoints
-    @Value("${services.course.api.create}")
-    private String courseCreateEndpoint;
-
-    @Value("${services.course.api.getAll}")
-    private String courseReadAllEndpoint;
-
-    @Value("${services.course.api.getById}")
-    private String courseReadByIdEndpoint;
-
     @Value("${services.course.api.getByCourseUUID}")
     private String courseReadByUUIDEndpoint;
 
@@ -50,119 +38,10 @@ public class CourseServiceClient {
         this.restClient = restClient;
     }
 
-    public ApiResponse<BFFRegisterCourseResponseDTO> registerCourse(BFFRegisterCourseRequestDTO requestDTO) {
+    public ApiResponse<BackendCourseDTO> getCourseByUUID(SagaCourseRequestByUUIDDTO requestDTO) {
 
         try {
-            log.info("Calling the Course Service's {} URI to register a course", courseCreateEndpoint);
-
-            return restClient.post()
-                    .uri(courseCreateEndpoint)
-                    .body(requestDTO)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {
-                          }
-                    );
-
-            // The MS thinks that the BFF made a mistake - 4xx error
-        } catch (HttpClientErrorException e) {
-            String downStreamMessage = e.getResponseBodyAsString();
-            log.error("BFF error when connecting to Course MS for course registration: {} - {}",
-                    e.getStatusCode().value(),
-                    downStreamMessage);
-            throw new CourseMicroServiceException("Course Service rejected the request",
-                    e.getStatusCode().value(),
-                    downStreamMessage);
-
-            // The MS encountered an error while processing the request - 5xx error
-        } catch (HttpServerErrorException e) {
-            String downStreamMessage = e.getResponseBodyAsString();
-            log.error("Server error from Course MS when course registration: {} - {}", e.getStatusCode().value(),
-                    downStreamMessage);
-            throw new CourseMicroServiceException("Course Service encountered an error.",
-                    e.getStatusCode().value(),
-                    downStreamMessage);
-
-        } catch (ResourceAccessException e) {
-            log.error("Network error reaching Course MS to register a course: {}", e.getMessage());
-            throw new CourseMicroServiceException("Cannot reach Course Service", 503);
-        }
-    }
-
-    public ApiResponse<PageResponseDTO<Object>> getAllCourses() {
-
-        try {
-            log.info("Calling the Course Service's {} URI to get all courses", courseReadAllEndpoint);
-
-            return restClient.post()
-                    .uri(courseReadAllEndpoint)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {
-                    });
-
-            // The MS thinks that the BFF made a mistake - 4xx error
-        } catch (HttpClientErrorException e) {
-            String downStreamMessage = e.getResponseBodyAsString();
-            log.error("BFF error when connecting to Course MS for to get all courses: {} - {}", e.getStatusCode().value(),
-                    downStreamMessage);
-            throw new CourseMicroServiceException("Course Service rejected the request",
-                    e.getStatusCode().value(),
-                    downStreamMessage);
-
-            // The MS encountered an error while processing the request - 5xx error
-        } catch (HttpServerErrorException e) {
-            String downStreamMessage = e.getResponseBodyAsString();
-            log.error("Server error from Course MS when retrieval of all courses: {} - {}", e.getStatusCode().value(),
-                    downStreamMessage);
-            throw new CourseMicroServiceException("Course Service encountered an error.",
-                    e.getStatusCode().value(),
-                    downStreamMessage);
-
-        } catch (ResourceAccessException e) {
-            log.error("Network error reaching Course MS to retrieve all courses: {}", e.getMessage());
-            throw new CourseMicroServiceException("Cannot reach Course Service", 503);
-        }
-    }
-
-    public ApiResponse<Object> getCourseById(BFFCourseRequestByIdDTO requestDTO) {
-
-        try {
-            log.info("Calling the Course Service's {} URI to get a course by ID: {}", courseReadByIdEndpoint, requestDTO.getCourseId());
-
-            return restClient.post()
-                    .uri(courseReadByIdEndpoint)
-                    .body(requestDTO)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {
-                    });
-
-        } // The MS thinks that the BFF made a mistake - 4xx error
-        catch (HttpClientErrorException e) {
-            String downStreamMessage = e.getResponseBodyAsString();
-            log.error("BFF error when connecting to Course MS for to get course by id: {} - {}", e.getStatusCode().value(),
-                    downStreamMessage);
-            throw new CourseMicroServiceException("Course Service rejected the request",
-                    e.getStatusCode().value(),
-                    downStreamMessage);
-
-            // The MS encountered an error while processing the request - 5xx error
-        } catch (HttpServerErrorException e) {
-            String downStreamMessage = e.getResponseBodyAsString();
-            log.error("Server error from Course MS when retrieval a course: {} - {}", e.getStatusCode().value(),
-                    downStreamMessage);
-            throw new CourseMicroServiceException("Course Service encountered an error.",
-                    e.getStatusCode().value(),
-                    downStreamMessage);
-
-        } catch (ResourceAccessException e) {
-            log.error("Network error reaching Course MS to retrieve a course: {}", e.getMessage());
-            throw new CourseMicroServiceException("Cannot reach Course Service", 503);
-        }
-    }
-
-    public ApiResponse<BackendCourseDTO> getCourseByUUID(BFFCourseRequestByUUIDDTO requestDTO) {
-
-        try {
-            log.info("Calling the Course Service's {} URI to get a course by UUID: {}", courseReadByIdEndpoint, requestDTO.getCourseUUID());
+            log.info("Calling the Course Service's {} URI to get a course by UUID: {}", courseReadByUUIDEndpoint, requestDTO.getCourseUUID());
 
             return restClient.post()
                     .uri(courseReadByUUIDEndpoint)
@@ -195,7 +74,8 @@ public class CourseServiceClient {
         }
     }
 
-    public ApiResponse<UUID> registerStudentToCourse(BFFCourseRequestByIdDTO requestDTO) {
+
+    public ApiResponse<UUID> registerStudentToCourse(SagaCourseRequestByIdDTO requestDTO) {
 
         try {
             log.info("Calling the Course Service's {} URI to register a student for a course with ID: {}",
@@ -235,7 +115,7 @@ public class CourseServiceClient {
         }
     }
 
-    public ApiResponse<String> registerStudentToCourseCompensation(BFFCourseRequestByUUIDDTO requestDTO) {
+    public ApiResponse<String> registerStudentToCourseCompensation(SagaCourseRequestByUUIDDTO requestDTO) {
 
         try {
             log.info("Calling the Course Service's {} URI to compensate the previous student registration for the course with UUID:  {}",
