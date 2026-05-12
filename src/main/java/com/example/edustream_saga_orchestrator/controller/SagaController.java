@@ -2,7 +2,6 @@ package com.example.edustream_saga_orchestrator.controller;
 
 import com.example.edustream_saga_orchestrator.dto.requestDTO.SagaRegisterStudentToCourseIDRequestDTO;
 import com.example.edustream_saga_orchestrator.dto.responseDTO.ApiResponse;
-import com.example.edustream_saga_orchestrator.dto.responseDTO.SagaLimitedStudentResponseDTO;
 import com.example.edustream_saga_orchestrator.service.SagaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +20,10 @@ public class SagaController {
     private final SagaService sagaService;
 
     @PostMapping("/enrollStudentToCourse")
-    public ResponseEntity<ApiResponse<SagaLimitedStudentResponseDTO>> enrollStudentToCourseEndpoint(
+    public ResponseEntity<ApiResponse<String>> enrollStudentToCourseEndpoint(
             @Valid @RequestBody SagaRegisterStudentToCourseIDRequestDTO requestDTO) {
 
-        ApiResponse<SagaLimitedStudentResponseDTO> response = sagaService.enrollStudentToCourseServiceMethod(requestDTO);
+        ApiResponse<String> response = sagaService.enrollStudentToCourseServiceMethod(requestDTO);
 
         return  ResponseEntity
                 .status(HttpStatus.OK)
