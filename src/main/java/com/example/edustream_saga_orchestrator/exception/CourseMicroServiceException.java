@@ -1,6 +1,6 @@
-package com.example.edustream_bff.exception;
+package com.example.edustream_saga_orchestrator.exception;
 
-public class CourseMicroServiceException extends BFFApplicationException {
+public class CourseMicroServiceException extends SagaApplicationException {
     public CourseMicroServiceException(String message, int statusCode) {
         super(message, statusCode);
     }

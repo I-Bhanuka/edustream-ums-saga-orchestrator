@@ -1,6 +1,6 @@
-package com.example.edustream_bff.exception;
+package com.example.edustream_saga_orchestrator.exception;
 
-import com.example.edustream_bff.dto.responseDTO.ErrorResponseDTO;
+import com.example.edustream_saga_orchestrator.dto.responseDTO.ErrorResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,9 +16,9 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     // 1. Custom exception handler - Every custom exception will be handled by ApplicationException
-    @ExceptionHandler(BFFApplicationException.class)
+    @ExceptionHandler(SagaApplicationException.class)
     public ResponseEntity<ErrorResponseDTO> handleApplicationException(
-            BFFApplicationException e) {
+            SagaApplicationException e) {
 
         ErrorResponseDTO errorResponseDTO = (e.getDownstreamMessage() != null)
                 ? ErrorResponseDTO.of(e.getStatusCode(), e.getMessage(), e.getDownstreamMessage())
