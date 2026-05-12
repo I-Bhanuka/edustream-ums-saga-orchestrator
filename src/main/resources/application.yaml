@@ -8,3 +8,31 @@ server:
   servlet:
     context-path: /saga
     # Set the Context path
+
+# NOTE: Service URLs are duplicated across BFF and Saga Orchestrator.
+# These should be centralized into a Spring Cloud Config Server
+# when the project matures. Any change here must be reflected there.
+
+# Backend services configuration
+services:
+
+  student:
+    url: http://localhost:8082/student
+    api:
+      test: /api/test
+      create: /api/create
+      getAll: /api/all
+      getAllLimited: /api/allWithLimitedDetails
+      getById: /api/getStudentById
+      registerToCourse: /api/registerToCourse
+
+  course:
+    url: http://localhost:8083/course
+    api:
+      test: /api/test
+      create: /api/create
+      getAll: /api/all
+      getById: /api/getCourseById
+      getByCourseUUID: /api/getCourseByUUID
+      registerToCourse: /api/registerToCourse
+      registerToCourseCompensation: /api/registerToCourseCompensation
