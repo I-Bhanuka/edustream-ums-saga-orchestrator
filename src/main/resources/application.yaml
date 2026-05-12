@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: edustream_saga-orchestrator
+
+server:
+  port: 8084  # Orchestrator runs on port 8084
+
+  servlet:
+    context-path: /saga
+    # Set the Context path
