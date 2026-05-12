@@ -1,14 +1,10 @@
-package com.example.edustream_bff.client;
+package com.example.edustream_saga_orchestrator.client;
 
-import com.example.edustream_bff.dto.backendResponse.BackendLimitedStudentResponseDTO;
-import com.example.edustream_bff.dto.backendResponse.BackendStudentResponseDTO;
-import com.example.edustream_bff.dto.backendResponse.PageResponseDTO;
-import com.example.edustream_bff.dto.requestDTO.BFFRegisterStudentRequestDTO;
-import com.example.edustream_bff.dto.requestDTO.BFFRegisterStudentToCourseUUIDRequestDTO;
-import com.example.edustream_bff.dto.requestDTO.BFFStudentRequestDTO;
-import com.example.edustream_bff.dto.responseDTO.ApiResponse;
-import com.example.edustream_bff.dto.responseDTO.BFFRegisterStudentResponseDTO;
-import com.example.edustream_bff.exception.StudentMicroServiceException;
+import com.example.edustream_saga_orchestrator.dto.backendResponseDTO.BackendStudentResponseDTO;
+import com.example.edustream_saga_orchestrator.dto.requestDTO.SagaRegisterStudentToCourseUUIDRequestDTO;
+import com.example.edustream_saga_orchestrator.dto.requestDTO.SagaStudentRequestDTO;
+import com.example.edustream_saga_orchestrator.dto.responseDTO.ApiResponse;
+import com.example.edustream_saga_orchestrator.exception.StudentMicroServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,12 +24,6 @@ public class StudentServiceClient {
     private final RestClient restClient;
 
     // Endpoints
-    @Value("${services.student.api.create}")
-    private String studentCreateEndpoint;
-
-    @Value("${services.student.api.getAllLimited}")
-    private String studentReadAllEndpoint;
-
     @Value("${services.student.api.getById}")
     private String studentReadByIdEndpoint;
 
@@ -45,80 +35,7 @@ public class StudentServiceClient {
         this.restClient = restClient;
     }
 
-
-    public ApiResponse<BFFRegisterStudentResponseDTO> registerStudent(BFFRegisterStudentRequestDTO registerStudentRequestDTO) {
-
-        try {
-            log.info("Calling the Student Service's {} URI to register a student", studentCreateEndpoint);
-
-            return restClient.post()
-                    .uri(studentCreateEndpoint)
-                    .body(registerStudentRequestDTO)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {
-                    });
-
-            // The MS thinks that the BFF made a mistake - 4xx errors
-        } catch (
-            HttpClientErrorException e) {
-            String downStreamMessage = e.getResponseBodyAsString();
-            log.error("BFF error when connecting to Student MS for student registration: {} - {}", e.getStatusCode().value(),
-                downStreamMessage);
-            throw new StudentMicroServiceException("Student Service rejected the request",
-                e.getStatusCode().value(),
-                downStreamMessage);
-
-            // The MS has an issue processing the request - 5xx errors
-        } catch (
-        HttpServerErrorException e) {
-            String downStreamMessage = e.getResponseBodyAsString();
-            log.error("Server error from Student MS when student registration: {} - {}", e.getStatusCode().value(),
-                    downStreamMessage);
-            throw new StudentMicroServiceException("Student Service encountered an error.",
-                    e.getStatusCode().value(),
-                    downStreamMessage);
-
-        } catch (ResourceAccessException e) {
-            log.error("Network error reaching Student MS to register a student: {}", e.getMessage());
-            throw new StudentMicroServiceException("Cannot reach Student Service", 503);
-        }
-    }
-
-    public ApiResponse<PageResponseDTO<BackendLimitedStudentResponseDTO>> getAllStudentsWithLimitedDetails() {
-
-        try {
-            log.info("Calling the Student Service's {} URI to get all students with limited details", studentCreateEndpoint);
-
-            return restClient.post()
-                    .uri(studentReadAllEndpoint)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {
-                    });
-
-            // The MS thinks that the BFF made a mistake - 4xx errors
-        } catch (HttpClientErrorException e) {
-            String downStreamMessage = e.getResponseBodyAsString();
-            log.error("BFF error when connecting to Student MS for to get all students: {} - {}", e.getStatusCode().value(),
-                    downStreamMessage);
-            throw new StudentMicroServiceException("Student Service rejected the request",
-                    e.getStatusCode().value(),
-                    downStreamMessage);
-
-            // The MS has an issue processing the request - 5xx errors
-        } catch (HttpServerErrorException e) {
-            String downStreamMessage = e.getResponseBodyAsString();
-            log.error("Server error from Student MS when retrieval of all students: {} - {}", e.getStatusCode().value(),
-                    downStreamMessage);
-            throw new StudentMicroServiceException("Student Service encountered an error.", e.getStatusCode().value(),
-                    downStreamMessage);
-
-        } catch (ResourceAccessException e) {
-            log.error("Network error reaching Student MS to retrieve all students: {}", e.getMessage());
-            throw new StudentMicroServiceException("Cannot reach Student Service", 503);
-        }
-    }
-
-    public ApiResponse<BackendStudentResponseDTO> getStudentById(BFFStudentRequestDTO studentRequestDTO) {
+    public ApiResponse<BackendStudentResponseDTO> getStudentById(SagaStudentRequestDTO studentRequestDTO) {
 
         try {
 
@@ -156,7 +73,7 @@ public class StudentServiceClient {
         }
     }
 
-    public ApiResponse<String> registerStudentToCourseClient(BFFRegisterStudentToCourseUUIDRequestDTO request) {
+    public ApiResponse<String> registerStudentToCourseClient(SagaRegisterStudentToCourseUUIDRequestDTO request) {
 
         try {
 
