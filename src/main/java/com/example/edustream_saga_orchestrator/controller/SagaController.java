@@ -49,7 +49,7 @@ public class SagaController {
                 .status(HttpStatus.OK)
                 .body(ApiResponse.<String>builder()
                         .success(true)
-                        .message("(String) context.get(\"studentServiceClientResponse\"))")
+                        .message((String) context.get("studentServiceClientResponse"))
                         .data(null)
                         .build());
 
